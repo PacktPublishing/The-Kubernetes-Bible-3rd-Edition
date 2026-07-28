@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sysctl *)",
+      "Bash(minikube delete *)",
+      "Bash(sudo tee /etc/sysctl.d/99-minikube.conf <<'EOF'\nfs.inotify.max_user_watches=524288\nfs.inotify.max_user_instances=512\nEOF)",
+      "Bash(minikube start *)",
+      "Bash(kubectl get nodes *)"
+    ]
+  }
+}

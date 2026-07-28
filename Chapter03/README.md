@@ -5,9 +5,9 @@
   - [minikube configurations](#minikube-configurations)
   - [Deploying Kubernetes using minikube](#deploying-kubernetes-using-minikube)
   - [Stop/Pause/Delete minikube clusters](#stoppausedelete-minikube-clusters)
+  - [Multi-node Kubernetes using minikube](#multi-node-kubernetes-using-minikube)
   - [Multiple Kubernetes clusters using minikube](#multiple-kubernetes-clusters-using-minikube)
     - [minikube check profiles](#minikube-check-profiles)
-  - [Multi-node Kubernetes using minikube](#multi-node-kubernetes-using-minikube)
   - [Installing Kind](#installing-kind)
   - [Creating cluster using kind](#creating-cluster-using-kind)
 
@@ -279,12 +279,44 @@ $ minikube delete
 💀  Removed all traces of the "minikube" cluster.
 ```
 
+## Multi-node Kubernetes using minikube
+
+```shell
+$ minikube start --driver=podman --nodes=3 --kubernetes-version=1.36.3
+
+$ kubectl get nodes
+NAME           STATUS   ROLES           AGE     VERSION
+minikube       Ready    control-plane   8m16s   v1.36.3
+minikube-m02   Ready    <none>          8m1s    v1.36.3
+minikube-m03   Ready    <none>          7m47s   v1.36.3
+```
+
+```shell
+$ minikube start \
+  --driver=podman \
+  --nodes 5 \
+  --ha true \
+  --cpus=2 \
+  --memory=2g \
+  --kubernetes-version=1.36.3
+```
+
+```shell
+$ kubectl get nodes
+NAME           STATUS   ROLES           AGE     VERSION
+minikube       Ready    control-plane   2m57s   v1.36.3
+minikube-m02   Ready    control-plane   2m19s   v1.36.3
+minikube-m03   Ready    control-plane   100s    v1.36.3
+minikube-m04   Ready    <none>          83s     v1.36.3
+minikube-m05   Ready    <none>          65s     v1.36.3
+```
+
 
 ## Multiple Kubernetes clusters using minikube
 
 ```shell
 # Start a minikube cluster using Podman as driver.
-$ minikube start --profile cluster-docker --driver=podman
+$ minikube start --profile cluster-podman --driver=podman
 
 $ minikube start --profile cluster-vbox --driver=virtualbox
 ```
@@ -292,32 +324,21 @@ $ minikube start --profile cluster-vbox --driver=virtualbox
 ### minikube check profiles
 
 ```shell
-$ minikube profile list
-|----------------|------------|------------|----------------|------|---------|---------|-------|----------------|--------------------|
-|    Profile     | VM Driver  |  Runtime   |       IP       | Port | Version | Status  | Nodes | Active Profile | Active Kubecontext |
-|----------------|------------|------------|----------------|------|---------|---------|-------|----------------|--------------------|
-| cluster-docker | docker     | containerd | 192.168.49.2   | 8443 | v1.30.0 | Running |     1 |                |                    |
-| cluster-vbox   | virtualbox | containerd | 192.168.59.145 | 8443 | v1.30.0 | Running |     1 |                | *                  |
-|----------------|------------|------------|----------------|------|---------|---------|-------|----------------|--------------------|
+$ $  minikube profile list
+┌────────────────┬────────────┬─────────┬────────────────┬─────────┬────────┬───────┬────────────────┬────────────────────┐
+│    PROFILE     │   DRIVER   │ RUNTIME │       IP       │ VERSION │ STATUS │ NODES │ ACTIVE PROFILE │ ACTIVE KUBECONTEXT │
+├────────────────┼────────────┼─────────┼────────────────┼─────────┼────────┼───────┼────────────────┼────────────────────┤
+│ cluster-podman │ podman     │ docker  │ 192.168.58.2   │ v1.35.1 │ OK     │ 1     │                │                    │
+│ cluster-vbox   │ virtualbox │ docker  │ 192.168.59.191 │ v1.35.1 │ OK     │ 1     │                │ *                  │
+└────────────────┴────────────┴─────────┴────────────────┴─────────┴────────┴───────┴────────────────┴────────────────────┘
 
 # Stop cluster
-$ minikube stop --profile cluster-docker
+$ minikube stop --profile cluster-podman
 
 # Remove the cluster
 $ minikube delete --profile cluster-podman
 ```
 
-## Multi-node Kubernetes using minikube
-
-```shell
-$ minikube start --driver=podman --nodes=3 --kubernetes-version=1.36.3
-
-$ kubectl get nodes
-NAME           STATUS   ROLES           AGE   VERSION
-minikube       Ready    control-plane   77s   v1.28.3
-minikube-m02   Ready    <none>          58s   v1.28.3
-minikube-m03   Ready    <none>          44s   v1.28.3
-```
 
 ## Installing Kind
 
