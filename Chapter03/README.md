@@ -452,6 +452,5 @@ $ kind create cluster \
   --config ~/.kube/kind_cluster \
   --image kindest/node:v1.29.2@sha256:51a1434a5397193442f0be2a297b488b6c919ce8a3931be0ce822606ea5ca245
 ```
-TEST
 
 Refer to [github.com/kubernetes-sigs/kind/releases](https://github.com/kubernetes-sigs/kind/releases) to learn more.
