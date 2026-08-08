@@ -275,7 +275,7 @@ E0728 22:49:28.695173 1073729 cache.go:239] Error downloading kic artifacts:  no
 $ minikube delete
 🔥  Deleting "minikube" in podman ...
 🔥  Deleting container "minikube" ...
-🔥  Removing /home/gmadappa/.minikube/machines/minikube ...
+🔥  Removing /home/gineesh/.minikube/machines/minikube ...
 💀  Removed all traces of the "minikube" cluster.
 ```
 
@@ -366,7 +366,11 @@ $ choco install kind
 ## Creating cluster using kind
 
 ```shell
-$ kind create cluster --name test-kind
+$ KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --name test-kind
+```
+
+```shell
+$ export KIND_EXPERIMENTAL_PROVIDER=podman
 ```
 
 ```shell
@@ -413,7 +417,7 @@ $ kubectl get --raw='/readyz?verbose'
 readyz check passed
 ```
 
-Config file creating multi-node cluster - eg: `~/.kube/kind_cluster`
+Config file creating multi-node cluster - eg: `kind-multi-node-cluster.yaml`
 
 ```yaml
 kind: Cluster
@@ -428,29 +432,19 @@ nodes:
 Create cluster
 
 ```shell
-$ kind create cluster --config ~/.kube/kind_cluster
-```
-
-Start with Podman instead of Docker
-
-```shell
-$ KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --config ~/.kube/kind_cluster
+$ kind create cluster --config kind-multi-node-cluster.yaml
 ```
 
 Mention the Kubernetes version
 
 ```shell
-# 1.29.0
+# 1.36.1
 $ kind create cluster \
   --name my-kind-cluster \
-  --config ~/.kube/kind_cluster \
-  --image kindest/node:v1.29.0@sha256:eaa1450915475849a73a9227b8f201df25e55e268e5d619312131292e324d570
-
-# 1.29.0
-$ kind create cluster \
-  --name my-kind-cluster \
-  --config ~/.kube/kind_cluster \
-  --image kindest/node:v1.29.2@sha256:51a1434a5397193442f0be2a297b488b6c919ce8a3931be0ce822606ea5ca245
+  --config kind-multi-node-cluster.yaml \
+  --image kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
 ```
+
+image: k
 
 Refer to [github.com/kubernetes-sigs/kind/releases](https://github.com/kubernetes-sigs/kind/releases) to learn more.
