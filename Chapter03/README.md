@@ -344,23 +344,26 @@ $ minikube delete --profile cluster-podman
 
 ```shell
 ## Linux:
-$ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.1/kind-$(uname)-amd64
-$ chmod +x ./kind
-$ mv ./kind /usr/local/bin/kind
+$ [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-amd64
 
-# macOS:
-$ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.1/kind-$(uname)-amd64
-$ chmod +x ./kind
-$ mv ./kind /usr/local/bin/kind
+# For ARM64
+$ [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-arm64
 
-# Homebrew:
-$ brew install kind
+$ chmod +x ./kind
+
+$ mv ./kind ~/.local/bin/kind
+
+# For Intel Macs
+$ [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-darwin-amd64
+
+# For M1 / ARM Macs
+$ [ $(uname -m) = arm64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-darwin-arm64
 
 # Windows:
-$ curl.exe -Llo kind-windows-amd64.exe https
+curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.32.0/kind-windows-amd64
 
-# Chocolatey:
-$ choco install kind
+Move-Item .\kind-windows-amd64.exe c:\some-dir-in-your-PATH\kind.exe
+
 ```
 
 ## Creating cluster using kind
@@ -433,6 +436,31 @@ Create cluster
 
 ```shell
 $ kind create cluster --config kind-multi-node-cluster.yaml
+using podman due to KIND_EXPERIMENTAL_PROVIDER
+enabling experimental podman provider
+Creating cluster "kind" ...
+ ✓ Ensuring node image (kindest/node:v1.36.1) 🖼
+ ✓ Preparing nodes 📦 📦 📦 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+ ✓ Joining worker nodes 🚜
+Set kubectl context to "kind-kind"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-kind
+
+Have a nice day! 👋
+```
+
+```shell
+$ kubectl get nodes
+NAME                 STATUS   ROLES           AGE   VERSION
+kind-control-plane   Ready    control-plane   14m   v1.36.1
+kind-worker          Ready    <none>          14m   v1.36.1
+kind-worker2         Ready    <none>          14m   v1.36.1
+kind-worker3         Ready    <none>          14m   v1.36.1
 ```
 
 Mention the Kubernetes version
@@ -445,6 +473,15 @@ $ kind create cluster \
   --image kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
 ```
 
-image: k
 
 Refer to [github.com/kubernetes-sigs/kind/releases](https://github.com/kubernetes-sigs/kind/releases) to learn more.
+
+Delete cluster
+
+```shell
+$ kind delete cluster
+using podman due to KIND_EXPERIMENTAL_PROVIDER
+enabling experimental podman provider
+Deleting cluster "kind" ...
+Deleted nodes: ["kind-worker" "kind-worker3" "kind-control-plane" "kind-worker2"]
+```
