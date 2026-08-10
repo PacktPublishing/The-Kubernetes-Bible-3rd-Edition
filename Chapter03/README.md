@@ -275,7 +275,7 @@ E0728 22:49:28.695173 1073729 cache.go:239] Error downloading kic artifacts:  no
 $ minikube delete
 🔥  Deleting "minikube" in podman ...
 🔥  Deleting container "minikube" ...
-🔥  Removing /home/gmadappa/.minikube/machines/minikube ...
+🔥  Removing /home/gineesh/.minikube/machines/minikube ...
 💀  Removed all traces of the "minikube" cluster.
 ```
 
@@ -344,29 +344,36 @@ $ minikube delete --profile cluster-podman
 
 ```shell
 ## Linux:
-$ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.1/kind-$(uname)-amd64
-$ chmod +x ./kind
-$ mv ./kind /usr/local/bin/kind
+$ [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-amd64
 
-# macOS:
-$ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.1/kind-$(uname)-amd64
-$ chmod +x ./kind
-$ mv ./kind /usr/local/bin/kind
+# For ARM64
+$ [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-arm64
 
-# Homebrew:
-$ brew install kind
+$ chmod +x ./kind
+
+$ mv ./kind ~/.local/bin/kind
+
+# For Intel Macs
+$ [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-darwin-amd64
+
+# For M1 / ARM Macs
+$ [ $(uname -m) = arm64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-darwin-arm64
 
 # Windows:
-$ curl.exe -Llo kind-windows-amd64.exe https
+curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.32.0/kind-windows-amd64
 
-# Chocolatey:
-$ choco install kind
+Move-Item .\kind-windows-amd64.exe c:\some-dir-in-your-PATH\kind.exe
+
 ```
 
 ## Creating cluster using kind
 
 ```shell
-$ kind create cluster --name test-kind
+$ KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --name test-kind
+```
+
+```shell
+$ export KIND_EXPERIMENTAL_PROVIDER=podman
 ```
 
 ```shell
@@ -413,7 +420,7 @@ $ kubectl get --raw='/readyz?verbose'
 readyz check passed
 ```
 
-Config file creating multi-node cluster - eg: `~/.kube/kind_cluster`
+Config file creating multi-node cluster - eg: `kind-multi-node-cluster.yaml`
 
 ```yaml
 kind: Cluster
@@ -428,29 +435,53 @@ nodes:
 Create cluster
 
 ```shell
-$ kind create cluster --config ~/.kube/kind_cluster
+$ kind create cluster --config kind-multi-node-cluster.yaml
+using podman due to KIND_EXPERIMENTAL_PROVIDER
+enabling experimental podman provider
+Creating cluster "kind" ...
+ ✓ Ensuring node image (kindest/node:v1.36.1) 🖼
+ ✓ Preparing nodes 📦 📦 📦 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+ ✓ Joining worker nodes 🚜
+Set kubectl context to "kind-kind"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-kind
+
+Have a nice day! 👋
 ```
 
-Start with Podman instead of Docker
-
 ```shell
-$ KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster --config ~/.kube/kind_cluster
+$ kubectl get nodes
+NAME                 STATUS   ROLES           AGE   VERSION
+kind-control-plane   Ready    control-plane   14m   v1.36.1
+kind-worker          Ready    <none>          14m   v1.36.1
+kind-worker2         Ready    <none>          14m   v1.36.1
+kind-worker3         Ready    <none>          14m   v1.36.1
 ```
 
 Mention the Kubernetes version
 
 ```shell
-# 1.29.0
+# 1.36.1
 $ kind create cluster \
   --name my-kind-cluster \
-  --config ~/.kube/kind_cluster \
-  --image kindest/node:v1.29.0@sha256:eaa1450915475849a73a9227b8f201df25e55e268e5d619312131292e324d570
-
-# 1.29.0
-$ kind create cluster \
-  --name my-kind-cluster \
-  --config ~/.kube/kind_cluster \
-  --image kindest/node:v1.29.2@sha256:51a1434a5397193442f0be2a297b488b6c919ce8a3931be0ce822606ea5ca245
+  --config kind-multi-node-cluster.yaml \
+  --image kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
 ```
 
+
 Refer to [github.com/kubernetes-sigs/kind/releases](https://github.com/kubernetes-sigs/kind/releases) to learn more.
+
+Delete cluster
+
+```shell
+$ kind delete cluster
+using podman due to KIND_EXPERIMENTAL_PROVIDER
+enabling experimental podman provider
+Deleting cluster "kind" ...
+Deleted nodes: ["kind-worker" "kind-worker3" "kind-control-plane" "kind-worker2"]
+```
