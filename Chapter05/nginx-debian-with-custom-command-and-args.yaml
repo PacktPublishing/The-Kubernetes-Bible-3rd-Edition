@@ -1,4 +1,4 @@
-# nginx-debian-with-custom-command-and-args
+# nginx-debian-with-custom-command-and-args.yaml
 apiVersion: v1
 kind: Pod
 metadata:
