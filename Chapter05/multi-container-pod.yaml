@@ -1,4 +1,4 @@
-# multi-container-pod.yaml 
+# multi-container-pod.yaml
 apiVersion: v1
 kind: Pod
 metadata:

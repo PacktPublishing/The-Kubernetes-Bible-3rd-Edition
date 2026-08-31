@@ -13,7 +13,8 @@ spec:
         - name: log-volume
           mountPath: /var/log/nginx
     - name: fluentd-sidecar
-      image: fluent/fluentd:v1.17
+      # image: fluent/fluentd:v1.17
+      image: fluent/fluentd:v1.19-debian-2
       volumeMounts:
         - name: log-volume
           mountPath: /var/log/nginx
